@@ -182,7 +182,10 @@ function movePlayer(e) {
 		player.y -= player.speed;
 	else if (e.key == "s" && !isNextOutOfBounds(player, "+"))
 		player.y += player.speed;
-
+	// else if (e.key == "ArrowUp" && !isNextOutOfBounds(opponent, "-"))
+	// 	opponent.y -= opponent.speed;
+	// else if (e.key == "ArrowDown" && !isNextOutOfBounds(opponent, "+"))
+	// 	opponent.y += opponent.speed;
 }
 
 function isNextOutOfBounds(paddle, sign) {
@@ -194,49 +197,49 @@ function isNextOutOfBounds(paddle, sign) {
 
 // AI opponent
 
-//	get ball direction and speed every 1 second 
+//	get ball projected position when opponent hits ball/every 1 second 
 //	estimate ball position
 //	if ball is planned to land far
 //		hold key to move to position
 //	else if ball is planned to land close
 //		repeatedly press key (8x/s)
 
-// const KEY_HOLD_DELAY = 30;
-// const KEY_HOLD_INITIAL_DELAY = 500;
-// let lastKeyPress = 0;
-// let lastDirection = 0; // down = 1, up = -1, idle = 0
-// let directionChangeTime = 0;
+const KEY_HOLD_DELAY = 30;
+const KEY_HOLD_INITIAL_DELAY = 500;
+let lastKeyPress = 0;
+let lastDirection = 0; // down = 1, up = -1, idle = 0
+let directionChangeTime = 0;
 
-// function updateOpponentPosition() {
-// 	const currentTime = Date.now();
+function updateOpponentPosition() {
+	const currentTime = Date.now();
 
-// 	const diff = ball.y - (opponent.y + opponent.height / 2);
-// 	let newDirection = diff > 0 ? 1 : diff < 0 ? -1 : 0;
+	const diff = ball.y - (opponent.y + opponent.height / 2);
+	let newDirection = diff > 0 ? 1 : diff < 0 ? -1 : 0;
 
-// 	// check if direction changed
-// 	if (newDirection !== lastDirection) {
-// 		directionChangeTime = currentTime;
-// 		lastDirection = newDirection;
+	// check if direction changed
+	if (newDirection !== lastDirection) {
+		directionChangeTime = currentTime;
+		lastDirection = newDirection;
 
-// 		if (newDirection > 0 && !isNextOutOfBounds(opponent, "+"))
-// 			opponent.y += paddleSpeed;
-// 		else if (newDirection < 0 && !isNextOutOfBounds(opponent, "-"))
-// 			opponent.y -= paddleSpeed;
-// 	}
+		if (newDirection > 0 && !isNextOutOfBounds(opponent, "+"))
+			opponent.y += paddleSpeed;
+		else if (newDirection < 0 && !isNextOutOfBounds(opponent, "-"))
+			opponent.y -= paddleSpeed;
+	}
 
-// 	// Only move if enough time has passed since last key press and direction change
-// 	if (currentTime - lastKeyPress >= KEY_HOLD_DELAY && currentTime - directionChangeTime >= KEY_HOLD_INITIAL_DELAY) {
-// 		if (diff > paddleSpeed) {
-// 			opponent.y += paddleSpeed;
-// 		} else if (diff < -paddleSpeed) {
-// 			opponent.y -= paddleSpeed;
-// 		}
-// 		lastKeyPress = currentTime;
-// 	}
+	// Only move if enough time has passed since last key press and direction change
+	if (currentTime - lastKeyPress >= KEY_HOLD_DELAY && currentTime - directionChangeTime >= KEY_HOLD_INITIAL_DELAY) {
+		if (diff > paddleSpeed) {
+			opponent.y += paddleSpeed;
+		} else if (diff < -paddleSpeed) {
+			opponent.y -= paddleSpeed;
+		}
+		lastKeyPress = currentTime;
+	}
 
-// 	// Ensure the opponent's paddle stays within boundaries
-// 	opponent.y = Math.max(0, Math.min(opponent.y, boardHeight - opponent.height));
-// }
+	// Ensure the opponent's paddle stays within boundaries
+	opponent.y = Math.max(0, Math.min(opponent.y, boardHeight - opponent.height));
+}
 
-// // Set interval to update opponent's position every 30ms
-// setInterval(updateOpponentPosition, KEY_REPEAT_INTERVAL);
+// Set interval to update opponent's position every 30ms
+setInterval(updateOpponentPosition, KEY_REPEAT_INTERVAL);
