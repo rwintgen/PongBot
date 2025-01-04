@@ -209,14 +209,12 @@ function isNextOutOfBounds(paddle, sign) {
 // AI opponent
 
 function updateOpponentPosition() {
-    const diff = ball.y - (opponent.y + opponent.height / 2);
+	const diff = ball.y - (opponent.y + opponent.height / 2);
 
-    if (diff > 0 && !isNextOutOfBounds(opponent, "+")) {
-        opponent.y += paddleSpeed;
-    } else if (diff < 0 && !isNextOutOfBounds(opponent, "-")) {
-        opponent.y -= paddleSpeed;
-    }
+	if (diff > 0 && !isNextOutOfBounds(opponent, "+"))
+		opponent.y += paddleSpeed;
+	else if (diff < 0 && !isNextOutOfBounds(opponent, "-"))
+		opponent.y -= paddleSpeed;
 
-    // Ensure the opponent's paddle stays within boundaries
-    opponent.y = Math.max(0, Math.min(opponent.y, boardHeight - opponent.height));
+	opponent.y = Math.max(0, Math.min(opponent.y, boardHeight - opponent.height));
 }
