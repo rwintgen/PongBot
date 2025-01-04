@@ -25,14 +25,14 @@ let opponent = {
 
 let ballWidth = 10;
 let ballHeight = 10;
-let ballSpeed = 3;
+let ballSpeed = 2;
 
 let ball = {
 	width: ballWidth,
 	height: ballHeight,
 	speed: ballSpeed, 
 	velocityX: -ballSpeed, // set up first ball behavior
-	velocityY: 0,
+	velocityY: 0, // set up first ball behavior
 	x: boardWidth / 2 - ballWidth / 2,
 	y: boardHeight / 2 - ballHeight / 2
 }
@@ -48,37 +48,38 @@ window.onload = function() {
 
 	requestAnimationFrame(refreshFrame);
 	document.addEventListener("keydown", movePlayer);
+
+	// Set interval to update opponent's position every 30ms
+	setInterval(updateOpponentPosition, 30);
 }
 
 function refreshFrame() {
 	requestAnimationFrame(refreshFrame);
 	context.clearRect(0, 0, boardWidth, boardHeight);
-	
+
 	context.fillStyle = "#ffffff";
 	context.fillRect(player.x, player.y, player.width, player.height);
-	
+
 	context.fillStyle = "#00ff00";
 	context.fillRect(opponent.x, opponent.y, opponent.width, opponent.height);
-	
+
 	context.fillStyle = "#ff0000";
 	context.fillRect(ball.x, ball.y, ball.width, ball.height);
-	
+
 	context.fillStyle = "#ffffff";
-    context.font = "20px Arial";
-    context.fillText("Player: " + playerScore, 20, 20);
-    context.fillText("Opponent: " + opponentScore, boardWidth - 140, 20);
-	
+	context.font = "20px Arial";
+	context.fillText("Player: " + playerScore, 20, 20);
+	context.fillText("Opponent: " + opponentScore, boardWidth - 140, 20);
+
 	moveBall();
-	updateOpponentPosition();
 }
 
 function moveBall() {
 	ball.x += ball.velocityX;
 	ball.y += ball.velocityY;
 
-	if (ball.y <= 0 || ball.y + ball.height >= boardHeight) {
+	if (ball.y <= 0 || ball.y + ball.height >= boardHeight)
 		ball.velocityY *= -1;
-	}
 
 	// player
 	if (ball.x <= player.x + player.width && ball.y + ball.height >= player.y && ball.y <= player.y + player.height) {
@@ -104,7 +105,7 @@ function moveBall() {
 	
 	}
 
-	// check for lost point
+	// check for point
 	if (ball.x <= 0) {
 		opponentScore++;
 		resetGame(false);
@@ -121,66 +122,74 @@ function resetGame(playerLost) {
 	ball.speed = ballSpeed;
 
 	if (playerLost)
-        ball.velocityX = ballSpeed;
-    else
-        ball.velocityX = -ballSpeed;
-    ball.velocityY = 0;
+		ball.velocityX = ballSpeed;
+	else
+		ball.velocityX = -ballSpeed;
+	ball.velocityY = 0;
 
 	player.y = boardHeight / 2 - player.height / 2;
 	opponent.y = boardHeight / 2 - opponent.height / 2;
-
 }
 
 function movePlayer(e) {
-	if (e.key == "ArrowUp" && !isNextOutOfBounds("-"))
+	if (e.key == "w" && !isNextOutOfBounds(player, "-"))
 		player.y -= player.speed;
-	else if (e.key == "ArrowDown" && !isNextOutOfBounds("+"))
+	else if (e.key == "s" && !isNextOutOfBounds(player, "+"))
 		player.y += player.speed;
+
 }
 
-function isNextOutOfBounds(sign) {
-	if ((sign == '-' && player.y - player.speed < 0) ||
-		(sign == '+' && player.y + player.height + player.speed > boardHeight))
-		return true;
-	return false;
+function isNextOutOfBounds(paddle, sign) {
+	if ((sign == '-' && paddle.y - paddle.speed < 0) ||
+		(sign == '+' && paddle.y + paddle.height + paddle.speed > boardHeight))
+		return (true);
+	return (false);
 }
-
-
-
-
 
 // AI opponent
 
-const KEY_REPEAT_INTERVAL = 30; // Minimum interval between moves in milliseconds
-const DIRECTION_CHANGE_DELAY = 500; // Idle time when changing direction in milliseconds
+//	get ball direction and speed every 1 second 
+//	estimate ball position
+//	if ball is planned to land far
+//		hold key to move to position
+//	else if ball is planned to land close
+//		repeatedly press key (8x/s)
+
+const KEY_HOLD_DELAY = 30;
+const KEY_HOLD_INITIAL_DELAY = 500;
 let lastKeyPress = 0;
-let lastDirection = 0; // 1 for down, -1 for up, 0 for no movement
+let lastDirection = 0; // down = 1, up = -1, idle = 0
 let directionChangeTime = 0;
 
 function updateOpponentPosition() {
-    const currentTime = Date.now();
+	const currentTime = Date.now();
 
-    const diff = ball.y - (opponent.y + opponent.height / 2);
-    let newDirection = diff > 0 ? 1 : diff < 0 ? -1 : 0;
+	const diff = ball.y - (opponent.y + opponent.height / 2);
+	let newDirection = diff > 0 ? 1 : diff < 0 ? -1 : 0;
 
-    // Check if the direction has changed
-    if (newDirection !== lastDirection) {
-        directionChangeTime = currentTime;
-        lastDirection = newDirection;
-    }
+	// check if direction changed
+	if (newDirection !== lastDirection) {
+		directionChangeTime = currentTime;
+		lastDirection = newDirection;
 
-    // Only move if enough time has passed since last key press and direction change
-    if (currentTime - lastKeyPress >= KEY_REPEAT_INTERVAL && currentTime - directionChangeTime >= DIRECTION_CHANGE_DELAY) {
-        if (diff > paddleSpeed) {
-            opponent.y += paddleSpeed;
-        } else if (diff < -paddleSpeed) {
-            opponent.y -= paddleSpeed;
-        }
-        lastKeyPress = currentTime;
-    }
+		if (newDirection > 0 && !isNextOutOfBounds(opponent, "+"))
+			opponent.y += paddleSpeed;
+		else if (newDirection < 0 && !isNextOutOfBounds(opponent, "-"))
+			opponent.y -= paddleSpeed;
+	}
 
-    // Ensure the opponent's paddle stays within boundaries
-    opponent.y = Math.max(0, Math.min(opponent.y, boardHeight - opponent.height));
+	// Only move if enough time has passed since last key press and direction change
+	if (currentTime - lastKeyPress >= KEY_HOLD_DELAY && currentTime - directionChangeTime >= KEY_HOLD_INITIAL_DELAY) {
+		if (diff > paddleSpeed) {
+			opponent.y += paddleSpeed;
+		} else if (diff < -paddleSpeed) {
+			opponent.y -= paddleSpeed;
+		}
+		lastKeyPress = currentTime;
+	}
+
+	// Ensure the opponent's paddle stays within boundaries
+	opponent.y = Math.max(0, Math.min(opponent.y, boardHeight - opponent.height));
 }
 
 // Set interval to update opponent's position every 30ms
