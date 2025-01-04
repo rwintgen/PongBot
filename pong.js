@@ -25,7 +25,7 @@ let opponent = {
 
 let ballWidth = 10;
 let ballHeight = 10;
-let ballSpeed = 2;
+let ballSpeed = 3;
 
 let ball = {
 	width: ballWidth,
@@ -53,22 +53,23 @@ window.onload = function() {
 function refreshFrame() {
 	requestAnimationFrame(refreshFrame);
 	context.clearRect(0, 0, boardWidth, boardHeight);
-
+	
 	context.fillStyle = "#ffffff";
 	context.fillRect(player.x, player.y, player.width, player.height);
-
+	
 	context.fillStyle = "#00ff00";
 	context.fillRect(opponent.x, opponent.y, opponent.width, opponent.height);
-
+	
 	context.fillStyle = "#ff0000";
 	context.fillRect(ball.x, ball.y, ball.width, ball.height);
-
+	
 	context.fillStyle = "#ffffff";
     context.font = "20px Arial";
     context.fillText("Player: " + playerScore, 20, 20);
     context.fillText("Opponent: " + opponentScore, boardWidth - 140, 20);
-
+	
 	moveBall();
+	updateOpponentPosition();
 }
 
 function moveBall() {
@@ -150,3 +151,24 @@ function isNextOutOfBounds(sign) {
 
 // AI opponent
 
+const KEY_REPEAT_INTERVAL = 30; // Minimum interval between moves in milliseconds
+let lastKeyPress = 0;
+
+function updateOpponentPosition() {
+    const currentTime = Date.now();
+
+    const diff = ball.y - (opponent.y + opponent.height / 2);
+    
+    // Only move if enough time has passed since last key press
+    if (currentTime - lastKeyPress >= KEY_REPEAT_INTERVAL) {
+        if (diff > paddleSpeed) {
+            opponent.y += paddleSpeed;
+        } else if (diff < -paddleSpeed) {
+            opponent.y -= paddleSpeed;
+        }
+        lastKeyPress = currentTime;
+    }
+    
+    // Ensure the opponent's paddle stays within boundaries
+    opponent.y = Math.max(0, Math.min(opponent.y, boardHeight - opponent.height));
+}
