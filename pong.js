@@ -152,15 +152,25 @@ function isNextOutOfBounds(sign) {
 // AI opponent
 
 const KEY_REPEAT_INTERVAL = 30; // Minimum interval between moves in milliseconds
+const DIRECTION_CHANGE_DELAY = 500; // Idle time when changing direction in milliseconds
 let lastKeyPress = 0;
+let lastDirection = 0; // 1 for down, -1 for up, 0 for no movement
+let directionChangeTime = 0;
 
 function updateOpponentPosition() {
     const currentTime = Date.now();
 
     const diff = ball.y - (opponent.y + opponent.height / 2);
-    
-    // Only move if enough time has passed since last key press
-    if (currentTime - lastKeyPress >= KEY_REPEAT_INTERVAL) {
+    let newDirection = diff > 0 ? 1 : diff < 0 ? -1 : 0;
+
+    // Check if the direction has changed
+    if (newDirection !== lastDirection) {
+        directionChangeTime = currentTime;
+        lastDirection = newDirection;
+    }
+
+    // Only move if enough time has passed since last key press and direction change
+    if (currentTime - lastKeyPress >= KEY_REPEAT_INTERVAL && currentTime - directionChangeTime >= DIRECTION_CHANGE_DELAY) {
         if (diff > paddleSpeed) {
             opponent.y += paddleSpeed;
         } else if (diff < -paddleSpeed) {
@@ -168,7 +178,10 @@ function updateOpponentPosition() {
         }
         lastKeyPress = currentTime;
     }
-    
+
     // Ensure the opponent's paddle stays within boundaries
     opponent.y = Math.max(0, Math.min(opponent.y, boardHeight - opponent.height));
 }
+
+// Set interval to update opponent's position every 30ms
+setInterval(updateOpponentPosition, KEY_REPEAT_INTERVAL);
