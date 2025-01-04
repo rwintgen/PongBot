@@ -53,6 +53,49 @@ window.onload = function() {
 	setInterval(updateOpponentPosition, 30);
 }
 
+function drawPredictedTrajectory() {
+	let predictedX = ball.x + ball.width / 2;
+	let predictedY = ball.y + ball.height / 2;
+	let velocityX = ball.velocityX;
+	let velocityY = ball.velocityY;
+	const predictionTime = 500000;
+	const predictionInterval = 1000;
+	const steps = predictionTime / predictionInterval;
+
+	context.strokeStyle = "#ff0000";
+	context.lineWidth = 1;
+	context.beginPath();
+	context.moveTo(predictedX, predictedY);
+
+	for (let i = 0; i < steps; i++) {
+		predictedX += velocityX * (predictionInterval / 1000);
+		predictedY += velocityY * (predictionInterval / 1000);
+
+		// top and bottom walls
+		if (predictedY <= 0 || predictedY + ball.height >= boardHeight) {
+			velocityY *= -1;
+		}
+		// assumed left wall
+		if (predictedX <= 25) {
+			velocityX *= -1;
+		}
+
+		context.lineTo(predictedX, predictedY);
+
+		if (predictedX >= 475) {
+			break;
+		}
+	}
+
+	context.stroke();
+
+	// predicted ball position when hitting opponent's paddle 
+	context.fillStyle = "#ff0000";
+	context.beginPath();
+	context.arc(predictedX, predictedY, ball.width / 2, 0, 2 * Math.PI);
+	context.fill();
+}
+
 function refreshFrame() {
 	requestAnimationFrame(refreshFrame);
 	context.clearRect(0, 0, boardWidth, boardHeight);
@@ -63,14 +106,17 @@ function refreshFrame() {
 	context.fillStyle = "#00ff00";
 	context.fillRect(opponent.x, opponent.y, opponent.width, opponent.height);
 
-	context.fillStyle = "#ff0000";
-	context.fillRect(ball.x, ball.y, ball.width, ball.height);
+    context.fillStyle = "#00ff00";
+    context.beginPath();
+    context.arc(ball.x + ball.width / 2, ball.y + ball.height / 2, ball.width / 2, 0, 2 * Math.PI);
+    context.fill();
 
 	context.fillStyle = "#ffffff";
 	context.font = "20px Arial";
 	context.fillText("Player: " + playerScore, 20, 20);
 	context.fillText("Opponent: " + opponentScore, boardWidth - 140, 20);
 
+	drawPredictedTrajectory();
 	moveBall();
 }
 
@@ -155,42 +201,42 @@ function isNextOutOfBounds(paddle, sign) {
 //	else if ball is planned to land close
 //		repeatedly press key (8x/s)
 
-const KEY_HOLD_DELAY = 30;
-const KEY_HOLD_INITIAL_DELAY = 500;
-let lastKeyPress = 0;
-let lastDirection = 0; // down = 1, up = -1, idle = 0
-let directionChangeTime = 0;
+// const KEY_HOLD_DELAY = 30;
+// const KEY_HOLD_INITIAL_DELAY = 500;
+// let lastKeyPress = 0;
+// let lastDirection = 0; // down = 1, up = -1, idle = 0
+// let directionChangeTime = 0;
 
-function updateOpponentPosition() {
-	const currentTime = Date.now();
+// function updateOpponentPosition() {
+// 	const currentTime = Date.now();
 
-	const diff = ball.y - (opponent.y + opponent.height / 2);
-	let newDirection = diff > 0 ? 1 : diff < 0 ? -1 : 0;
+// 	const diff = ball.y - (opponent.y + opponent.height / 2);
+// 	let newDirection = diff > 0 ? 1 : diff < 0 ? -1 : 0;
 
-	// check if direction changed
-	if (newDirection !== lastDirection) {
-		directionChangeTime = currentTime;
-		lastDirection = newDirection;
+// 	// check if direction changed
+// 	if (newDirection !== lastDirection) {
+// 		directionChangeTime = currentTime;
+// 		lastDirection = newDirection;
 
-		if (newDirection > 0 && !isNextOutOfBounds(opponent, "+"))
-			opponent.y += paddleSpeed;
-		else if (newDirection < 0 && !isNextOutOfBounds(opponent, "-"))
-			opponent.y -= paddleSpeed;
-	}
+// 		if (newDirection > 0 && !isNextOutOfBounds(opponent, "+"))
+// 			opponent.y += paddleSpeed;
+// 		else if (newDirection < 0 && !isNextOutOfBounds(opponent, "-"))
+// 			opponent.y -= paddleSpeed;
+// 	}
 
-	// Only move if enough time has passed since last key press and direction change
-	if (currentTime - lastKeyPress >= KEY_HOLD_DELAY && currentTime - directionChangeTime >= KEY_HOLD_INITIAL_DELAY) {
-		if (diff > paddleSpeed) {
-			opponent.y += paddleSpeed;
-		} else if (diff < -paddleSpeed) {
-			opponent.y -= paddleSpeed;
-		}
-		lastKeyPress = currentTime;
-	}
+// 	// Only move if enough time has passed since last key press and direction change
+// 	if (currentTime - lastKeyPress >= KEY_HOLD_DELAY && currentTime - directionChangeTime >= KEY_HOLD_INITIAL_DELAY) {
+// 		if (diff > paddleSpeed) {
+// 			opponent.y += paddleSpeed;
+// 		} else if (diff < -paddleSpeed) {
+// 			opponent.y -= paddleSpeed;
+// 		}
+// 		lastKeyPress = currentTime;
+// 	}
 
-	// Ensure the opponent's paddle stays within boundaries
-	opponent.y = Math.max(0, Math.min(opponent.y, boardHeight - opponent.height));
-}
+// 	// Ensure the opponent's paddle stays within boundaries
+// 	opponent.y = Math.max(0, Math.min(opponent.y, boardHeight - opponent.height));
+// }
 
-// Set interval to update opponent's position every 30ms
-setInterval(updateOpponentPosition, KEY_REPEAT_INTERVAL);
+// // Set interval to update opponent's position every 30ms
+// setInterval(updateOpponentPosition, KEY_REPEAT_INTERVAL);
