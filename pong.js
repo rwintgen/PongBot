@@ -172,7 +172,8 @@ function moveBall() {
 		let normalizedIntersectY = intersectY / (player.height / 2);
 		let bounceAngle = normalizedIntersectY * Math.PI / 4;
 
-		ball.speed += 0.1;
+		if (ball.speed < 12)
+			ball.speed += 0.1;
 		ball.velocityX = ball.speed * Math.cos(bounceAngle);
 		ball.velocityY = ball.speed * Math.sin(bounceAngle);
 	}
@@ -183,7 +184,8 @@ function moveBall() {
 		let normalizedIntersectY = intersectY / (opponent.height / 2);
 		let bounceAngle = normalizedIntersectY * Math.PI / 4;
 
-		ball.speed += 0.1;
+		if (ball.speed < 12)
+			ball.speed += 0.1;
 		ball.velocityX = -ball.speed * Math.cos(bounceAngle);
 		ball.velocityY = ball.speed * Math.sin(bounceAngle);
 	}
