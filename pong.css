@@ -1,9 +1,31 @@
 body {
-    text-align: center;
+	text-align: center;
+	background-color: #001a00;
+}
+
+h1 {
+	margin-top: 80px;
+	font-style: italic;
+	font-family: 'Courier New', Courier, monospace;
+	color:#00ff00
 }
 
 #board {
-    background-color: #001a00;
-    border-top: 5px solid #00ff00;
-    border-bottom: 5px solid #00ff00;
+	background-color: #001a00;
+	border-top: 5px solid #00ff00;
+	border-bottom: 5px solid #00ff00;
+}
+
+#scoreboard {
+    text-align: center;
+    margin-top: 40px;
+	font-family: 'Courier New', Courier, monospace;
+}
+
+#playerScore {
+	color: white;
+}
+
+#opponentScore {
+	color: #00ff00;
 }

@@ -80,10 +80,13 @@ function draw() {
 	context.arc(ball.x + ball.width / 2, ball.y + ball.height / 2, ball.width / 2, 0, 2 * Math.PI);
 	context.fill();
 
-	context.fillStyle = "#ffffff";
-	context.font = "20px Arial";
-	context.fillText("Player: " + playerScore, 20, 20);
-	context.fillText("Opponent: " + opponentScore, boardWidth - 140, 20);
+	// context.fillStyle = "#ffffff";
+	// context.font = "20px Courier New";
+	// context.fillText("Player: " + playerScore, 20, 20);
+	// context.fillText("Opponent: " + opponentScore, boardWidth - 140, 20);
+
+	document.getElementById('playerScore').innerText = "Player: " + playerScore;
+	document.getElementById('opponentScore').innerText = "Opponent: " + opponentScore;
 
 	// drawPredictedTrajectory();
 }
