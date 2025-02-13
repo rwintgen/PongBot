@@ -1,4 +1,4 @@
 # PongBot
-Web implementation of the classic Pong game and an AI opponent.  
-
-https://github.com/user-attachments/assets/bfbeb083-3049-4e18-a353-38d53c2b8540
+Web implementation of the classic Pong game.  
+It features a cahllengin, human-like behaving AI opponent able to dynamically predict ball trajectory, aim where the player isn't, and grab powerups all the while refreshing its view odf the game state only once per second.
+NOTE: This repo is an distilled excerpt from another projet, [ft_transcendence](https://github.com/arthurmalangin/42_ft_transcendence/).

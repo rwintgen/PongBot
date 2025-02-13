@@ -12,8 +12,7 @@ h1 {
 
 #board {
 	background-color: #001a00;
-	border-top: 5px solid #00ff00;
-	border-bottom: 5px solid #00ff00;
+	border: 1px solid #00ff00;
 }
 
 #scoreboard {
